@@ -20,33 +20,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto San
 .page.active{display:block;}
 .card{background:#fff;border-radius:14px;padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
 .card-title{font-size:11px;font-weight:700;color:#888;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;}
-.scanner-wrap{position:relative;width:100%;background:#000;border-radius:12px;overflow:hidden;margin-bottom:12px;display:none;}
-#preview{width:100%;height:260px;object-fit:cover;display:block;}
-.scanner-overlay{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
-.scanner-frame{width:200px;height:200px;border:2px solid #1D9E75;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.45);}
-.scanner-line{position:absolute;width:180px;height:2px;background:linear-gradient(90deg,transparent,#1D9E75,transparent);animation:scan 2s linear infinite;}
-@keyframes scan{0%{top:calc(50% - 90px)}100%{top:calc(50% + 90px)}}
-.scanner-status{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#fff;font-size:13px;background:rgba(0,0,0,0.5);padding:6px;}
-.btn-scan{width:100%;height:50px;font-size:16px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:all 0.15s;margin-bottom:10px;}
-.btn-scan.start{background:#1D9E75;color:#fff;}
-.btn-scan.start:hover{background:#17876a;}
-.btn-scan.stop{background:#dc2626;color:#fff;}
-.divider{display:flex;align-items:center;gap:10px;margin:10px 0;color:#aaa;font-size:13px;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:#e5e7eb;}
-#scanInput{width:100%;height:54px;font-size:22px;font-family:"Courier New",monospace;border:2px solid #d1d5db;border-radius:10px;padding:0 14px;color:#1a1a1a;background:#fff;letter-spacing:0.04em;transition:border-color 0.15s;}
-#scanInput:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px rgba(29,158,117,0.15);}
+
+.scan-hint{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#1e40af;display:flex;align-items:center;gap:8px;}
+.scan-hint-icon{font-size:18px;}
+
+#scanInput{width:100%;height:58px;font-size:22px;font-family:"Courier New",monospace;border:2px solid #1D9E75;border-radius:10px;padding:0 14px;color:#1a1a1a;background:#fff;letter-spacing:0.04em;transition:all 0.15s;box-shadow:0 0 0 3px rgba(29,158,117,0.1);}
+#scanInput:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 4px rgba(29,158,117,0.25);}
 #scanInput::placeholder{font-size:15px;letter-spacing:0;color:#aaa;font-family:inherit;}
-#queryBtn{width:100%;height:52px;margin-top:10px;font-size:18px;font-weight:700;color:#fff;background:#1D9E75;border:none;border-radius:10px;cursor:pointer;transition:all 0.15s;}
+#queryBtn{width:100%;height:48px;margin-top:10px;font-size:16px;font-weight:700;color:#fff;background:#1D9E75;border:none;border-radius:10px;cursor:pointer;transition:all 0.15s;}
 #queryBtn:hover{background:#17876a;}
 #queryBtn:active{transform:scale(0.98);}
 #clearBtn{width:100%;height:40px;margin-top:8px;font-size:13px;font-weight:600;color:#888;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;display:none;}
 #clearBtn:hover{background:#e5e7eb;}
+
 .result-empty{text-align:center;padding:24px;color:#bbb;font-size:15px;}
 .result-notfound{text-align:center;padding:28px 16px;border-radius:10px;background:#fff1f1;border:2px solid #f87171;}
 .notfound-icon{font-size:48px;margin-bottom:10px;}
 .notfound-title{font-size:22px;font-weight:800;color:#b91c1c;margin-bottom:6px;}
 .notfound-code{font-size:16px;color:#dc2626;font-family:"Courier New",monospace;background:#fee2e2;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:6px;}
 .notfound-sub{font-size:14px;color:#ef4444;}
+
 .result-found{border-radius:10px;overflow:hidden;border:1.5px solid #e5e7eb;}
 .result-found.danger{border:2.5px solid #ef4444;box-shadow:0 0 0 3px rgba(239,68,68,0.15);}
 .found-header{background:#f8f9fa;padding:12px 16px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px;}
@@ -60,21 +53,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto San
 .found-row:last-child{border-bottom:none;}
 .fr-key{font-size:14px;color:#666;}
 .fr-val{font-size:15px;font-weight:600;color:#1a1a1a;text-align:right;max-width:65%;}
+
 .qty-big{font-size:38px;font-weight:800;line-height:1;}
 .qty-big.good{color:#059669;}
-.qty-big.warn{color:#d97706;}
 .qty-big.zero{color:#dc2626;}
 .qty-big.danger{color:#dc2626;}
+.qty-big.negative{color:#7f1d1d;}
 .qty-unit{font-size:16px;color:#888;margin-left:4px;font-weight:400;}
 .qty-pill{font-size:12px;padding:3px 10px;border-radius:99px;font-weight:700;margin-left:8px;vertical-align:middle;}
 .qty-pill.good{background:#d1fae5;color:#065f46;}
-.qty-pill.warn{background:#fef3c7;color:#92400e;}
 .qty-pill.zero{background:#fee2e2;color:#991b1b;}
 .qty-pill.danger{background:#fee2e2;color:#991b1b;}
+.qty-pill.negative{background:#7f1d1d;color:#fff;}
+
 .danger-alert{background:#b91c1c;border-radius:10px;padding:14px 16px;margin:12px 16px;display:flex;align-items:center;gap:12px;}
+.danger-alert.negative{background:#450a0a;border:2px solid #fca5a5;}
 .danger-alert-icon{font-size:28px;flex-shrink:0;}
 .danger-alert-title{font-size:17px;font-weight:800;color:#fff;}
 .danger-alert-sub{font-size:13px;color:#fca5a5;margin-top:2px;}
+
 .h-row{display:flex;justify-content:space-between;align-items:center;padding:9px 6px;border-bottom:1px solid #f3f4f6;cursor:pointer;border-radius:8px;}
 .h-row:last-child{border-bottom:none;}
 .h-row:hover{background:#f8f9fa;}
@@ -82,9 +79,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto San
 .h-name{font-size:11px;color:#888;margin-top:2px;}
 .h-qty{font-size:14px;font-weight:700;}
 .h-qty.good{color:#059669;}
-.h-qty.warn{color:#d97706;}
 .h-qty.danger{color:#dc2626;}
 .h-qty.zero{color:#dc2626;}
+.h-qty.negative{color:#7f1d1d;}
+
 .upload-box{border:2px dashed #c8ccd0;border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;transition:all 0.15s;}
 .upload-box:hover{border-color:#1D9E75;background:#f0fdf8;}
 .upload-box.loaded{border:2px solid #1D9E75;background:#e8faf3;}
@@ -102,11 +100,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto San
 .stat-item{background:#f8f9fa;border-radius:10px;padding:12px;text-align:center;}
 .stat-num{font-size:24px;font-weight:800;color:#1a1a1a;}
 .stat-num.red{color:#dc2626;}
-.stat-num.orange{color:#d97706;}
+.stat-num.dark-red{color:#7f1d1d;}
 .stat-label{font-size:11px;color:#888;margin-top:2px;}
+
 @media(max-width:400px){
-  #preview{height:220px;}
-  .scanner-frame{width:170px;height:170px;}
   .qty-big{font-size:32px;}
   .stat-grid{grid-template-columns:1fr 1fr;}
 }
@@ -127,25 +124,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto San
 <div class="page active" id="page-query">
   <div class="card">
     <div class="card-title">掃描 / 輸入產品編號</div>
-    <div class="scanner-wrap" id="scannerWrap">
-      <video id="preview" playsinline autoplay muted></video>
-      <div class="scanner-overlay">
-        <div class="scanner-frame"></div>
-        <div class="scanner-line"></div>
-      </div>
-      <div class="scanner-status" id="scannerStatus">對準條碼掃描...</div>
+    <div class="scan-hint">
+      <span class="scan-hint-icon">📡</span>
+      <span>請使用藍牙掃描器掃描條碼，或手動輸入編號</span>
     </div>
-    <button class="btn-scan start" id="btnStart" onclick="startScan()">📷 開啟鏡頭掃描</button>
-    <button class="btn-scan stop" id="btnStop" onclick="stopScan()" style="display:none">✕ 關閉鏡頭</button>
-    <div class="divider">或手動輸入</div>
-    <input type="text" id="scanInput" placeholder="輸入產品編號..." autocomplete="off">
+    <input type="text" id="scanInput" placeholder="等待掃描或輸入..." autocomplete="off" inputmode="text">
     <button id="queryBtn" onclick="doQuery()">🔍 查　詢</button>
     <button id="clearBtn" onclick="clearAll()">✕ 清除，查詢下一筆</button>
   </div>
 
   <div class="card">
     <div class="card-title">查詢結果</div>
-    <div id="resultArea"><div class="result-empty">等待查詢...</div></div>
+    <div id="resultArea"><div class="result-empty">等待掃描...</div></div>
   </div>
 
   <div class="card" id="histCard" style="display:none">
@@ -158,7 +148,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto San
   <div class="info-box">
     📋 上傳最新庫存 Excel 後，查詢頁面立即同步。<br>
     支援欄位：<b>產品編號、品名規格、現有數量、安全存量</b><br>
-    ⚠️ 現有數量低於安全存量時會顯示<b style="color:#b91c1c">大紅色警示</b>
+    ⚠️ 負數庫存或低於安全存量會顯示<b style="color:#b91c1c">紅色警示</b>
   </div>
 
   <div class="card">
@@ -177,14 +167,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto San
     <div class="card-title">目前庫存狀態</div>
     <div class="stat-grid">
       <div class="stat-item"><div class="stat-num" id="statTotal">0</div><div class="stat-label">總品項</div></div>
-      <div class="stat-item"><div class="stat-num red" id="statDanger">0</div><div class="stat-label">低於安全存量</div></div>
-      <div class="stat-item"><div class="stat-num red" id="statZero">0</div><div class="stat-label">零庫存</div></div>
+      <div class="stat-item"><div class="stat-num dark-red" id="statNeg">0</div><div class="stat-label">負數庫存</div></div>
+      <div class="stat-item"><div class="stat-num red" id="statDanger">0</div><div class="stat-label">低於安全</div></div>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -224,11 +213,14 @@ function updateStats() {
   if (!inventory.length) return;
   document.getElementById('statsCard').style.display = 'block';
   document.getElementById('statTotal').textContent = inventory.length;
-  document.getElementById('statZero').textContent = inventory.filter(r => parseFloat(r.qty)||0 === 0).length;
+  document.getElementById('statNeg').textContent = inventory.filter(r => {
+    const qty = parseFloat(r.qty);
+    return !isNaN(qty) && qty < 0;
+  }).length;
   document.getElementById('statDanger').textContent = inventory.filter(r => {
     const qty = parseFloat(r.qty) || 0;
     const safe = parseFloat(r.safeQty);
-    return !isNaN(safe) && qty < safe;
+    return !isNaN(safe) && qty >= 0 && qty < safe;
   }).length;
 }
 
@@ -244,40 +236,64 @@ window._uploadToFirebase = async function(inv) {
 </script>
 
 <script>
+// ========= 音效 =========
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+}
+function beep(type) {
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    if (type === 'ok') {
+      o.frequency.value = 1000; o.type = 'sine';
+      g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      o.start(); o.stop(audioCtx.currentTime + 0.15);
+    } else {
+      o.frequency.value = 300; o.type = 'square';
+      g.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      o.start(); o.stop(audioCtx.currentTime + 0.4);
+    }
+  } catch(e) {}
+}
+
+// ========= 頁面切換 =========
 function showPage(p, el) {
   document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
   document.getElementById('page-' + p).classList.add('active');
   el.classList.add('active');
+  if (p === 'query') setTimeout(focusInput, 100);
 }
 
-let codeReader = null;
-function startScan() {
-  document.getElementById('scannerWrap').style.display = 'block';
-  document.getElementById('btnStart').style.display = 'none';
-  document.getElementById('btnStop').style.display = 'block';
-  if (typeof ZXing === 'undefined') { setTimeout(startScan, 500); return; }
-  codeReader = new ZXing.BrowserMultiFormatReader();
-  codeReader.decodeFromVideoDevice(null, 'preview', (result) => {
-    if (result) {
-      document.getElementById('scannerStatus').textContent = '✓ ' + result.getText();
-      stopScan();
-      document.getElementById('scanInput').value = result.getText();
-      doQuery();
-    }
-  });
-}
-function stopScan() {
-  if (codeReader) { codeReader.reset(); codeReader = null; }
-  document.getElementById('scannerWrap').style.display = 'none';
-  document.getElementById('btnStart').style.display = 'block';
-  document.getElementById('btnStop').style.display = 'none';
+// ========= 自動 focus =========
+function focusInput() {
+  const inp = document.getElementById('scanInput');
+  if (inp && document.getElementById('page-query').classList.contains('active')) {
+    inp.focus();
+  }
 }
 
+// 頁面載入 + 點任何地方都把游標拉回來
+window.addEventListener('load', focusInput);
+document.addEventListener('click', function(e) {
+  // 除非點到按鈕或輸入框，否則都把游標拉回掃描區
+  if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.closest('.tab') || e.target.closest('.upload-box') || e.target.closest('.h-row')) return;
+  focusInput();
+});
+
+// ========= 查詢 =========
 let autoTimer;
 document.getElementById('scanInput').addEventListener('input', function() {
   clearTimeout(autoTimer);
-  if (this.value.trim()) autoTimer = setTimeout(doQuery, 500);
+  if (this.value.trim()) autoTimer = setTimeout(doQuery, 400);
 });
 document.getElementById('scanInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') { clearTimeout(autoTimer); doQuery(); }
@@ -285,10 +301,14 @@ document.getElementById('scanInput').addEventListener('keydown', function(e) {
 
 function doQuery() {
   const q = document.getElementById('scanInput').value.trim();
-  if (!q) { document.getElementById('resultArea').innerHTML = '<div class="result-empty">請輸入或掃描產品編號</div>'; return; }
+  if (!q) { 
+    document.getElementById('resultArea').innerHTML = '<div class="result-empty">請掃描或輸入產品編號</div>'; 
+    return; 
+  }
   const inv = window._getInventory ? window._getInventory() : [];
   if (!inv.length) {
     document.getElementById('resultArea').innerHTML = '<div class="result-notfound"><div class="notfound-icon">⚠️</div><div class="notfound-title">庫存資料尚未上傳</div><div class="notfound-sub">請到「⚙️ 管理」頁面上傳庫存 Excel</div></div>';
+    beep('err');
     return;
   }
   const match = inv.find(r => String(r.pn||'').trim().toLowerCase() === q.toLowerCase());
@@ -299,6 +319,8 @@ function doQuery() {
       +'<div class="notfound-code">'+q+'</div>'
       +'<div class="notfound-sub">請確認條碼是否正確</div></div>';
     document.getElementById('clearBtn').style.display = 'block';
+    beep('err');
+    prepareNext();
     return;
   }
 
@@ -307,22 +329,31 @@ function doQuery() {
   const qty     = match.qty !== null && match.qty !== undefined ? Math.round(parseFloat(match.qty)||0) : null;
   const safeQty = match.safeQty !== null && match.safeQty !== undefined ? Math.round(parseFloat(match.safeQty)||0) : null;
 
-  const isZero   = qty !== null && qty === 0;
-  const isDanger = qty !== null && safeQty !== null && qty < safeQty;
-  const isWarn   = qty !== null && safeQty === null && qty > 0 && qty <= 10;
-  const isGood   = qty !== null && !isDanger && !isZero && !isWarn;
+  // === 狀態判斷（新邏輯）===
+  // 正常：qty > 0 且 (無安全存量 或 qty >= 安全存量)
+  // 其他一律異常
+  const isNegative = qty !== null && qty < 0;
+  const isZero     = qty !== null && qty === 0;
+  const isDanger   = qty !== null && qty > 0 && safeQty !== null && qty < safeQty;
+  const isGood     = qty !== null && qty > 0 && (safeQty === null || qty >= safeQty);
 
-  const cls  = isZero ? 'zero' : isDanger ? 'danger' : isWarn ? 'warn' : 'good';
-  const pill = isZero ? '已無庫存' : isDanger ? '低於安全存量！' : isWarn ? '庫存偏低' : '庫存正常';
+  let cls, pill, icon;
+  if (isNegative)     { cls = 'negative'; pill = '庫存負數！'; icon = '⛔'; }
+  else if (isZero)    { cls = 'zero';     pill = '已無庫存';   icon = '⚠️'; }
+  else if (isDanger)  { cls = 'danger';   pill = '低於安全存量！'; icon = '⚠️'; }
+  else                { cls = 'good';     pill = '庫存正常';   icon = '📦'; }
+
+  const isAbnormal = !isGood;
 
   document.getElementById('resultArea').innerHTML =
-    '<div class="result-found '+(isDanger||isZero?'danger':'')+'">'
-    +'<div class="found-header '+(isDanger||isZero?'danger':'')+'">'
-    +'<div class="found-icon '+(isDanger||isZero?'danger':'')+'">'+( isDanger||isZero ? '⚠️' : '📦')+'</div>'
+    '<div class="result-found '+(isAbnormal?'danger':'')+'">'
+    +'<div class="found-header '+(isAbnormal?'danger':'')+'">'
+    +'<div class="found-icon '+(isAbnormal?'danger':'')+'">'+icon+'</div>'
     +'<div><div class="found-label">產品編號</div><div class="found-pn">'+pn+'</div></div>'
     +'</div>'
-    +(isDanger ? '<div class="danger-alert"><div class="danger-alert-icon">🚨</div><div><div class="danger-alert-title">低於安全存量！</div><div class="danger-alert-sub">現有 '+qty+' 件 ／ 安全存量 '+safeQty+' 件，差 '+(safeQty-qty)+' 件</div></div></div>' : '')
-    +(isZero   ? '<div class="danger-alert"><div class="danger-alert-icon">🚨</div><div><div class="danger-alert-title">庫存已歸零！</div><div class="danger-alert-sub">請立即補貨</div></div></div>' : '')
+    +(isNegative ? '<div class="danger-alert negative"><div class="danger-alert-icon">⛔</div><div><div class="danger-alert-title">庫存負數！系統異常</div><div class="danger-alert-sub">現有數量為 '+qty+' 件，請通知管理員盤點核對</div></div></div>' : '')
+    +(isZero     ? '<div class="danger-alert"><div class="danger-alert-icon">🚨</div><div><div class="danger-alert-title">庫存已歸零！</div><div class="danger-alert-sub">請立即補貨</div></div></div>' : '')
+    +(isDanger   ? '<div class="danger-alert"><div class="danger-alert-icon">🚨</div><div><div class="danger-alert-title">低於安全存量！</div><div class="danger-alert-sub">現有 '+qty+' 件 ／ 安全存量 '+safeQty+' 件，差 '+(safeQty-qty)+' 件</div></div></div>' : '')
     +'<div class="found-body">'
     +'<div class="found-row"><span class="fr-key">品名規格</span><span class="fr-val">'+name+'</span></div>'
     +'<div class="found-row"><span class="fr-key">現有數量</span><span class="fr-val">'
@@ -333,13 +364,27 @@ function doQuery() {
 
   document.getElementById('clearBtn').style.display = 'block';
   addHist(pn, name, qty, cls);
+  
+  // 音效
+  if (isGood) beep('ok'); else beep('err');
+  
+  // 準備下一筆
+  prepareNext();
+}
+
+// 查詢完成後清空輸入框並把游標拉回去
+function prepareNext() {
+  setTimeout(() => {
+    document.getElementById('scanInput').value = '';
+    focusInput();
+  }, 1500);
 }
 
 function clearAll() {
   document.getElementById('scanInput').value = '';
-  document.getElementById('resultArea').innerHTML = '<div class="result-empty">等待查詢...</div>';
+  document.getElementById('resultArea').innerHTML = '<div class="result-empty">等待掃描...</div>';
   document.getElementById('clearBtn').style.display = 'none';
-  document.getElementById('scanInput').focus();
+  focusInput();
 }
 
 let hist = [];
@@ -355,8 +400,12 @@ function addHist(pn, name, qty, cls) {
     +'</div>'
   ).join('');
 }
-function fillAndQuery(pn) { document.getElementById('scanInput').value = pn; doQuery(); }
+function fillAndQuery(pn) { 
+  document.getElementById('scanInput').value = pn; 
+  doQuery(); 
+}
 
+// ========= 上傳 Excel =========
 document.getElementById('fileInput').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -374,12 +423,18 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
       const colQty  = findCol(headers, ['現有數量','庫存數量','現有','庫存','數量','qty','quantity','stock']);
       const colSafe = findCol(headers, ['安全存量','安全庫存','最低庫存','最低存量','safestock','minstock','safety']);
       if (colPN < 0) { setBadge('找不到產品編號欄位', false); return; }
-      window._pendingInventory = data.map(row => ({
-        pn:      String(row[colPN]  || '').trim(),
-        name:    colName >= 0 ? String(row[colName] || '').trim() : '',
-        qty:     colQty  >= 0 ? (parseFloat(String(row[colQty] ||'').replace(/,/g,'')) || 0) : null,
-        safeQty: colSafe >= 0 ? (parseFloat(String(row[colSafe]||'').replace(/,/g,'')) || null) : null
-      })).filter(r => r.pn);
+      window._pendingInventory = data.map(row => {
+        const qtyRaw = colQty >= 0 ? String(row[colQty] ||'').replace(/,/g,'') : '';
+        const safeRaw = colSafe >= 0 ? String(row[colSafe]||'').replace(/,/g,'') : '';
+        const qtyNum = qtyRaw === '' ? null : parseFloat(qtyRaw);
+        const safeNum = safeRaw === '' ? null : parseFloat(safeRaw);
+        return {
+          pn:      String(row[colPN]  || '').trim(),
+          name:    colName >= 0 ? String(row[colName] || '').trim() : '',
+          qty:     isNaN(qtyNum) ? null : qtyNum,
+          safeQty: isNaN(safeNum) ? null : safeNum
+        };
+      }).filter(r => r.pn);
 
       const hasSafe = colSafe >= 0;
       document.getElementById('uploadBox').classList.add('loaded');
