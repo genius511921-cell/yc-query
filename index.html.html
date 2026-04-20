@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>YC 庫存查詢系統</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto Sans TC",sans-serif;background:#f0f2f5;min-height:100vh;}
+.nav{background:#1a1a2e;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+.nav-title{color:#fff;font-size:17px;font-weight:700;}
+.nav-badge{font-size:11px;padding:3px 10px;border-radius:99px;font-weight:600;}
+.nav-badge.online{background:#d1fae5;color:#065f46;}
+.nav-badge.offline{background:#fee2e2;color:#991b1b;}
+.nav-badge.loading{background:#fef3c7;color:#92400e;}
+.tabs{display:flex;background:#fff;border-bottom:1px solid #e5e7eb;}
+.tab{flex:1;padding:12px 0;text-align:center;font-size:14px;font-weight:600;color:#888;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.15s;}
+.tab.active{color:#1D9E75;border-bottom-color:#1D9E75;}
+.page{display:none;padding:16px;max-width:500px;margin:0 auto;}
+.page.active{display:block;}
+.card{background:#fff;border-radius:14px;padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.card-title{font-size:11px;font-weight:700;color:#888;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;}
+.scanner-wrap{position:relative;width:100%;background:#000;border-radius:12px;overflow:hidden;margin-bottom:12px;display:none;}
+#preview{width:100%;height:260px;object-fit:cover;display:block;}
+.scanner-overlay{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.scanner-frame{width:200px;height:200px;border:2px solid #1D9E75;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.45);}
+.scanner-line{position:absolute;width:180px;height:2px;background:linear-gradient(90deg,transparent,#1D9E75,transparent);animation:scan 2s linear infinite;}
+@keyframes scan{0%{top:calc(50% - 90px)}100%{top:calc(50% + 90px)}}
+.scanner-status{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#fff;font-size:13px;background:rgba(0,0,0,0.5);padding:6px;}
+.btn-scan{width:100%;height:50px;font-size:16px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:all 0.15s;margin-bottom:10px;}
+.btn-scan.start{background:#1D9E75;color:#fff;}
+.btn-scan.start:hover{background:#17876a;}
+.btn-scan.stop{background:#dc2626;color:#fff;}
+.divider{display:flex;align-items:center;gap:10px;margin:10px 0;color:#aaa;font-size:13px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#e5e7eb;}
+#scanInput{width:100%;height:54px;font-size:22px;font-family:"Courier New",monospace;border:2px solid #d1d5db;border-radius:10px;padding:0 14px;color:#1a1a1a;background:#fff;letter-spacing:0.04em;transition:border-color 0.15s;}
+#scanInput:focus{outline:none;border-color:#1D9E75;box-shadow:0 0 0 3px rgba(29,158,117,0.15);}
+#scanInput::placeholder{font-size:15px;letter-spacing:0;color:#aaa;font-family:inherit;}
+#queryBtn{width:100%;height:52px;margin-top:10px;font-size:18px;font-weight:700;color:#fff;background:#1D9E75;border:none;border-radius:10px;cursor:pointer;transition:all 0.15s;}
+#queryBtn:hover{background:#17876a;}
+#queryBtn:active{transform:scale(0.98);}
+#clearBtn{width:100%;height:40px;margin-top:8px;font-size:13px;font-weight:600;color:#888;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;display:none;}
+#clearBtn:hover{background:#e5e7eb;}
+.result-empty{text-align:center;padding:24px;color:#bbb;font-size:15px;}
+.result-notfound{text-align:center;padding:28px 16px;border-radius:10px;background:#fff1f1;border:2px solid #f87171;}
+.notfound-icon{font-size:48px;margin-bottom:10px;}
+.notfound-title{font-size:22px;font-weight:800;color:#b91c1c;margin-bottom:6px;}
+.notfound-code{font-size:16px;color:#dc2626;font-family:"Courier New",monospace;background:#fee2e2;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:6px;}
+.notfound-sub{font-size:14px;color:#ef4444;}
+.result-found{border-radius:10px;overflow:hidden;border:1.5px solid #e5e7eb;}
+.result-found.danger{border:2.5px solid #ef4444;box-shadow:0 0 0 3px rgba(239,68,68,0.15);}
+.found-header{background:#f8f9fa;padding:12px 16px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px;}
+.found-header.danger{background:#fff1f1;border-bottom-color:#fca5a5;}
+.found-icon{width:40px;height:40px;border-radius:50%;background:#d1fae5;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.found-icon.danger{background:#fee2e2;}
+.found-pn{font-size:17px;font-weight:700;font-family:"Courier New",monospace;color:#1a1a1a;}
+.found-label{font-size:11px;color:#999;margin-bottom:2px;}
+.found-body{padding:0 16px;}
+.found-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f3f4f6;}
+.found-row:last-child{border-bottom:none;}
+.fr-key{font-size:14px;color:#666;}
+.fr-val{font-size:15px;font-weight:600;color:#1a1a1a;text-align:right;max-width:65%;}
+.qty-big{font-size:38px;font-weight:800;line-height:1;}
+.qty-big.good{color:#059669;}
+.qty-big.warn{color:#d97706;}
+.qty-big.zero{color:#dc2626;}
+.qty-big.danger{color:#dc2626;}
+.qty-unit{font-size:16px;color:#888;margin-left:4px;font-weight:400;}
+.qty-pill{font-size:12px;padding:3px 10px;border-radius:99px;font-weight:700;margin-left:8px;vertical-align:middle;}
+.qty-pill.good{background:#d1fae5;color:#065f46;}
+.qty-pill.warn{background:#fef3c7;color:#92400e;}
+.qty-pill.zero{background:#fee2e2;color:#991b1b;}
+.qty-pill.danger{background:#fee2e2;color:#991b1b;}
+.danger-alert{background:#b91c1c;border-radius:10px;padding:14px 16px;margin:12px 16px;display:flex;align-items:center;gap:12px;}
+.danger-alert-icon{font-size:28px;flex-shrink:0;}
+.danger-alert-title{font-size:17px;font-weight:800;color:#fff;}
+.danger-alert-sub{font-size:13px;color:#fca5a5;margin-top:2px;}
+.h-row{display:flex;justify-content:space-between;align-items:center;padding:9px 6px;border-bottom:1px solid #f3f4f6;cursor:pointer;border-radius:8px;}
+.h-row:last-child{border-bottom:none;}
+.h-row:hover{background:#f8f9fa;}
+.h-pn{font-size:13px;font-family:"Courier New",monospace;font-weight:600;color:#1a1a1a;}
+.h-name{font-size:11px;color:#888;margin-top:2px;}
+.h-qty{font-size:14px;font-weight:700;}
+.h-qty.good{color:#059669;}
+.h-qty.warn{color:#d97706;}
+.h-qty.danger{color:#dc2626;}
+.h-qty.zero{color:#dc2626;}
+.upload-box{border:2px dashed #c8ccd0;border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.upload-box:hover{border-color:#1D9E75;background:#f0fdf8;}
+.upload-box.loaded{border:2px solid #1D9E75;background:#e8faf3;}
+.upload-icon{font-size:30px;margin-bottom:6px;}
+.upload-main{font-size:15px;font-weight:600;color:#333;}
+.upload-sub{font-size:13px;color:#999;margin-top:4px;}
+.upload-badge{display:inline-block;margin-top:8px;font-size:12px;padding:4px 12px;border-radius:99px;font-weight:600;}
+.badge-ok{background:#d1fae5;color:#065f46;}
+.badge-err{background:#fee2e2;color:#991b1b;}
+.btn-upload{width:100%;height:50px;font-size:16px;font-weight:700;color:#fff;background:#2563eb;border:none;border-radius:10px;cursor:pointer;margin-top:12px;transition:all 0.15s;display:none;}
+.btn-upload:hover{background:#1d4ed8;}
+.btn-upload:disabled{background:#93c5fd;cursor:not-allowed;}
+.info-box{background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#0369a1;line-height:1.8;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px;}
+.stat-item{background:#f8f9fa;border-radius:10px;padding:12px;text-align:center;}
+.stat-num{font-size:24px;font-weight:800;color:#1a1a1a;}
+.stat-num.red{color:#dc2626;}
+.stat-num.orange{color:#d97706;}
+.stat-label{font-size:11px;color:#888;margin-top:2px;}
+@media(max-width:400px){
+  #preview{height:220px;}
+  .scanner-frame{width:170px;height:170px;}
+  .qty-big{font-size:32px;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-title">🔍 YC 庫存查詢</div>
+  <div class="nav-badge loading" id="connBadge">連線中...</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showPage('query',this)">🔍 查詢</div>
+  <div class="tab" onclick="showPage('admin',this)">⚙️ 管理</div>
+</div>
+
+<div class="page active" id="page-query">
+  <div class="card">
+    <div class="card-title">掃描 / 輸入產品編號</div>
+    <div class="scanner-wrap" id="scannerWrap">
+      <video id="preview" playsinline autoplay muted></video>
+      <div class="scanner-overlay">
+        <div class="scanner-frame"></div>
+        <div class="scanner-line"></div>
+      </div>
+      <div class="scanner-status" id="scannerStatus">對準條碼掃描...</div>
+    </div>
+    <button class="btn-scan start" id="btnStart" onclick="startScan()">📷 開啟鏡頭掃描</button>
+    <button class="btn-scan stop" id="btnStop" onclick="stopScan()" style="display:none">✕ 關閉鏡頭</button>
+    <div class="divider">或手動輸入</div>
+    <input type="text" id="scanInput" placeholder="輸入產品編號..." autocomplete="off">
+    <button id="queryBtn" onclick="doQuery()">🔍 查　詢</button>
+    <button id="clearBtn" onclick="clearAll()">✕ 清除，查詢下一筆</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">查詢結果</div>
+    <div id="resultArea"><div class="result-empty">等待查詢...</div></div>
+  </div>
+
+  <div class="card" id="histCard" style="display:none">
+    <div class="card-title">最近查詢（點選重查）</div>
+    <div id="histArea"></div>
+  </div>
+</div>
+
+<div class="page" id="page-admin">
+  <div class="info-box">
+    📋 上傳最新庫存 Excel 後，查詢頁面立即同步。<br>
+    支援欄位：<b>產品編號、品名規格、現有數量、安全存量</b><br>
+    ⚠️ 現有數量低於安全存量時會顯示<b style="color:#b91c1c">大紅色警示</b>
+  </div>
+
+  <div class="card">
+    <div class="card-title">上傳庫存 Excel</div>
+    <div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-icon">📋</div>
+      <div class="upload-main" id="uploadMain">點此選擇 Excel 庫存檔</div>
+      <div class="upload-sub" id="uploadSub">.xlsx / .xls 格式</div>
+      <div id="uploadBadge"></div>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none">
+    <button class="btn-upload" id="btnUpload" onclick="uploadInventory()">⬆ 上傳到雲端（立即同步）</button>
+  </div>
+
+  <div class="card" id="statsCard" style="display:none">
+    <div class="card-title">目前庫存狀態</div>
+    <div class="stat-grid">
+      <div class="stat-item"><div class="stat-num" id="statTotal">0</div><div class="stat-label">總品項</div></div>
+      <div class="stat-item"><div class="stat-num red" id="statDanger">0</div><div class="stat-label">低於安全存量</div></div>
+      <div class="stat-item"><div class="stat-num red" id="statZero">0</div><div class="stat-label">零庫存</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB7yTHdpvxUf1AXZ3N24sZzKx__ipEQGD4",
+  authDomain: "yc-inventory.firebaseapp.com",
+  projectId: "yc-inventory",
+  storageBucket: "yc-inventory.firebasestorage.app",
+  messagingSenderId: "591513427308",
+  appId: "1:591513427308:web:a981ebe0bfba56003b6749"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+let inventory = [];
+
+async function loadInventory() {
+  try {
+    const snap = await getDocs(collection(db, 'inventory'));
+    inventory = [];
+    snap.forEach(d => inventory.push(d.data()));
+    window._inventory = inventory;
+    document.getElementById('connBadge').textContent = '已連線（' + inventory.length + ' 筆）';
+    document.getElementById('connBadge').className = 'nav-badge online';
+    updateStats();
+  } catch(e) {
+    document.getElementById('connBadge').textContent = '連線失敗';
+    document.getElementById('connBadge').className = 'nav-badge offline';
+  }
+}
+loadInventory();
+window._getInventory = () => inventory;
+window._loadInventory = loadInventory;
+
+function updateStats() {
+  if (!inventory.length) return;
+  document.getElementById('statsCard').style.display = 'block';
+  document.getElementById('statTotal').textContent = inventory.length;
+  document.getElementById('statZero').textContent = inventory.filter(r => parseFloat(r.qty)||0 === 0).length;
+  document.getElementById('statDanger').textContent = inventory.filter(r => {
+    const qty = parseFloat(r.qty) || 0;
+    const safe = parseFloat(r.safeQty);
+    return !isNaN(safe) && qty < safe;
+  }).length;
+}
+
+window._uploadToFirebase = async function(inv) {
+  const batch = writeBatch(db);
+  inv.forEach((item, i) => {
+    const ref = doc(collection(db, 'inventory'), 'item_' + i);
+    batch.set(ref, item);
+  });
+  await batch.commit();
+  await loadInventory();
+};
+</script>
+
+<script>
+function showPage(p, el) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  el.classList.add('active');
+}
+
+let codeReader = null;
+function startScan() {
+  document.getElementById('scannerWrap').style.display = 'block';
+  document.getElementById('btnStart').style.display = 'none';
+  document.getElementById('btnStop').style.display = 'block';
+  if (typeof ZXing === 'undefined') { setTimeout(startScan, 500); return; }
+  codeReader = new ZXing.BrowserMultiFormatReader();
+  codeReader.decodeFromVideoDevice(null, 'preview', (result) => {
+    if (result) {
+      document.getElementById('scannerStatus').textContent = '✓ ' + result.getText();
+      stopScan();
+      document.getElementById('scanInput').value = result.getText();
+      doQuery();
+    }
+  });
+}
+function stopScan() {
+  if (codeReader) { codeReader.reset(); codeReader = null; }
+  document.getElementById('scannerWrap').style.display = 'none';
+  document.getElementById('btnStart').style.display = 'block';
+  document.getElementById('btnStop').style.display = 'none';
+}
+
+let autoTimer;
+document.getElementById('scanInput').addEventListener('input', function() {
+  clearTimeout(autoTimer);
+  if (this.value.trim()) autoTimer = setTimeout(doQuery, 500);
+});
+document.getElementById('scanInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { clearTimeout(autoTimer); doQuery(); }
+});
+
+function doQuery() {
+  const q = document.getElementById('scanInput').value.trim();
+  if (!q) { document.getElementById('resultArea').innerHTML = '<div class="result-empty">請輸入或掃描產品編號</div>'; return; }
+  const inv = window._getInventory ? window._getInventory() : [];
+  if (!inv.length) {
+    document.getElementById('resultArea').innerHTML = '<div class="result-notfound"><div class="notfound-icon">⚠️</div><div class="notfound-title">庫存資料尚未上傳</div><div class="notfound-sub">請到「⚙️ 管理」頁面上傳庫存 Excel</div></div>';
+    return;
+  }
+  const match = inv.find(r => String(r.pn||'').trim().toLowerCase() === q.toLowerCase());
+  if (!match) {
+    document.getElementById('resultArea').innerHTML =
+      '<div class="result-notfound"><div class="notfound-icon">❌</div>'
+      +'<div class="notfound-title">查無此料號</div>'
+      +'<div class="notfound-code">'+q+'</div>'
+      +'<div class="notfound-sub">請確認條碼是否正確</div></div>';
+    document.getElementById('clearBtn').style.display = 'block';
+    return;
+  }
+
+  const pn      = String(match.pn || '');
+  const name    = String(match.name || '-');
+  const qty     = match.qty !== null && match.qty !== undefined ? Math.round(parseFloat(match.qty)||0) : null;
+  const safeQty = match.safeQty !== null && match.safeQty !== undefined ? Math.round(parseFloat(match.safeQty)||0) : null;
+
+  const isZero   = qty !== null && qty === 0;
+  const isDanger = qty !== null && safeQty !== null && qty < safeQty;
+  const isWarn   = qty !== null && safeQty === null && qty > 0 && qty <= 10;
+  const isGood   = qty !== null && !isDanger && !isZero && !isWarn;
+
+  const cls  = isZero ? 'zero' : isDanger ? 'danger' : isWarn ? 'warn' : 'good';
+  const pill = isZero ? '已無庫存' : isDanger ? '低於安全存量！' : isWarn ? '庫存偏低' : '庫存正常';
+
+  document.getElementById('resultArea').innerHTML =
+    '<div class="result-found '+(isDanger||isZero?'danger':'')+'">'
+    +'<div class="found-header '+(isDanger||isZero?'danger':'')+'">'
+    +'<div class="found-icon '+(isDanger||isZero?'danger':'')+'">'+( isDanger||isZero ? '⚠️' : '📦')+'</div>'
+    +'<div><div class="found-label">產品編號</div><div class="found-pn">'+pn+'</div></div>'
+    +'</div>'
+    +(isDanger ? '<div class="danger-alert"><div class="danger-alert-icon">🚨</div><div><div class="danger-alert-title">低於安全存量！</div><div class="danger-alert-sub">現有 '+qty+' 件 ／ 安全存量 '+safeQty+' 件，差 '+(safeQty-qty)+' 件</div></div></div>' : '')
+    +(isZero   ? '<div class="danger-alert"><div class="danger-alert-icon">🚨</div><div><div class="danger-alert-title">庫存已歸零！</div><div class="danger-alert-sub">請立即補貨</div></div></div>' : '')
+    +'<div class="found-body">'
+    +'<div class="found-row"><span class="fr-key">品名規格</span><span class="fr-val">'+name+'</span></div>'
+    +'<div class="found-row"><span class="fr-key">現有數量</span><span class="fr-val">'
+    +(qty !== null ? '<span class="qty-big '+cls+'">'+qty+'</span><span class="qty-unit">件</span><span class="qty-pill '+cls+'">'+pill+'</span>' : '—')
+    +'</span></div>'
+    +(safeQty !== null ? '<div class="found-row"><span class="fr-key">安全存量</span><span class="fr-val" style="color:#666">'+safeQty+' 件</span></div>' : '')
+    +'</div></div>';
+
+  document.getElementById('clearBtn').style.display = 'block';
+  addHist(pn, name, qty, cls);
+}
+
+function clearAll() {
+  document.getElementById('scanInput').value = '';
+  document.getElementById('resultArea').innerHTML = '<div class="result-empty">等待查詢...</div>';
+  document.getElementById('clearBtn').style.display = 'none';
+  document.getElementById('scanInput').focus();
+}
+
+let hist = [];
+function addHist(pn, name, qty, cls) {
+  hist = hist.filter(h => h.pn !== pn);
+  hist.unshift({pn, name, qty, cls});
+  if (hist.length > 8) hist.pop();
+  document.getElementById('histCard').style.display = 'block';
+  document.getElementById('histArea').innerHTML = hist.map(h =>
+    '<div class="h-row" onclick="fillAndQuery(\''+h.pn+'\')">'
+    +'<div><div class="h-pn">'+h.pn+'</div><div class="h-name">'+h.name+'</div></div>'
+    +'<div class="h-qty '+(h.cls||'')+'">'+( h.qty !== null ? h.qty+' 件' : '—')+'</div>'
+    +'</div>'
+  ).join('');
+}
+function fillAndQuery(pn) { document.getElementById('scanInput').value = pn; doQuery(); }
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const wb = XLSX.read(new Uint8Array(evt.target.result), {type:'array', raw:false});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:false});
+      if (rows.length < 2) { setBadge('檔案內容不足', false); return; }
+      const headers = rows[0].map(h => String(h||'').trim().replace(/\s+/g,''));
+      const data = rows.slice(1).filter(r => r.some(c => c !== undefined && c !== ''));
+      const colPN   = findCol(headers, ['產品編號','產品編','料號','品號','編號','barcode','code','sku']);
+      const colName = findCol(headers, ['品名規格','品名','規格','名稱','name','description']);
+      const colQty  = findCol(headers, ['現有數量','庫存數量','現有','庫存','數量','qty','quantity','stock']);
+      const colSafe = findCol(headers, ['安全存量','安全庫存','最低庫存','最低存量','safestock','minstock','safety']);
+      if (colPN < 0) { setBadge('找不到產品編號欄位', false); return; }
+      window._pendingInventory = data.map(row => ({
+        pn:      String(row[colPN]  || '').trim(),
+        name:    colName >= 0 ? String(row[colName] || '').trim() : '',
+        qty:     colQty  >= 0 ? (parseFloat(String(row[colQty] ||'').replace(/,/g,'')) || 0) : null,
+        safeQty: colSafe >= 0 ? (parseFloat(String(row[colSafe]||'').replace(/,/g,'')) || null) : null
+      })).filter(r => r.pn);
+
+      const hasSafe = colSafe >= 0;
+      document.getElementById('uploadBox').classList.add('loaded');
+      document.getElementById('uploadMain').textContent = file.name;
+      document.getElementById('uploadSub').textContent = '共 ' + window._pendingInventory.length + ' 筆' + (hasSafe ? '（含安全存量✓）' : '（未含安全存量）');
+      setBadge('讀取成功 ' + window._pendingInventory.length + ' 筆', true);
+      document.getElementById('btnUpload').style.display = 'block';
+    } catch(e) { setBadge('讀取失敗，請確認格式', false); }
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+function findCol(headers, keys) { return headers.findIndex(h => keys.some(k => h.includes(k))); }
+function setBadge(msg, ok) { document.getElementById('uploadBadge').innerHTML = '<span class="upload-badge '+(ok?'badge-ok':'badge-err')+'">'+msg+'</span>'; }
+
+async function uploadInventory() {
+  const inv = window._pendingInventory;
+  if (!inv || !inv.length) return;
+  const btn = document.getElementById('btnUpload');
+  btn.disabled = true; btn.textContent = '上傳中...';
+  try {
+    await window._uploadToFirebase(inv);
+    btn.textContent = '✓ 上傳成功！查詢頁已同步';
+    btn.style.background = '#059669';
+    setTimeout(() => { btn.textContent = '⬆ 上傳到雲端（立即同步）'; btn.disabled = false; btn.style.background = ''; }, 3000);
+  } catch(e) { btn.textContent = '上傳失敗，請重試'; btn.disabled = false; }
+}
+</script>
+</body>
+</html>
